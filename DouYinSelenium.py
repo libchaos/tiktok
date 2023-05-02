@@ -82,9 +82,30 @@ class TikTok(object):
             videoRealUrl = self.oneVideoInfo("https://www.douyin.com" + i.get("href"))
             userVideoUrls.append(videoRealUrl)
         return userVideoUrls
+    
+
+    def latestVideo(self, tag="英语"):
+        url = f"https://www.douyin.com/search/{tag}?publish_time=1&sort_type=0&source=tab_search&type=video"
+        self.driver(url)
+        js = "var q=document.documentElement.scrollTop=100000"
+        while True:
+            self.driver.execute_script(js)
+            html = self.driver.page_source
+            soup = BeautifulSoup(html, 'html.parser')
+            if len(soup.findAll(name="div", attrs={"class": "Bllv0dx6"})) == 1:
+                break
+            time.sleep(1)
+
+        list = soup.findAll(name="a", attrs={"class": "B3AsdZT9 AqS8FEQL"})
+        videos = []
+        for i in list:
+            videosReadUrl = self.oneVideoInfo("https://www.douyin.com" + i.get("href"))
+            videos.append(videosReadUrl)
+        return videos
 
 
 tk = TikTok()
 # tk.oneVideoInfo()
-tk.userVideoInfo()
+# tk.userVideoInfo()
+print(tk.latestVideo(tag="英语"))
 tk.driver.quit()
